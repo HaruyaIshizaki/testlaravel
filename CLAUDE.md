@@ -36,24 +36,45 @@ Three main services compose the development environment:
 
 ## Common Commands
 
+### Using Makefile (Recommended)
+
+A Makefile is provided at the project root for convenient command execution. **Always run `make` commands from the project root directory** (not from `src/`).
+
+```bash
+# Show all available commands
+make help
+
+# Common operations
+make up              # Start Docker containers
+make down            # Stop Docker containers
+make shell           # Enter app container
+make migrate         # Run migrations
+make route-list      # Show all routes
+make test            # Run tests
+make cache-clear     # Clear all caches
+
+# Custom artisan command
+make artisan cmd="make:controller UserController"
+```
+
 ### Environment Setup
 
 ```bash
 # Initial setup
 cp .env.example .env
-docker-compose up -d
+docker compose up -d
 
 # Check container status
-docker-compose ps
+docker compose ps
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop environment
-docker-compose down
+docker compose down
 
 # Complete teardown (removes database volume)
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Initial Laravel Project Setup
@@ -62,10 +83,10 @@ If `src/` directory is empty, create a new Laravel project first:
 
 ```bash
 # Create new Laravel project in src/ directory
-docker-compose exec app composer create-project laravel/laravel .
+docker compose exec app composer create-project laravel/laravel .
 
 # Generate application key
-docker-compose exec app php artisan key:generate
+docker compose exec app php artisan key:generate
 
 # Verify database connection settings in src/.env
 # Should match docker-compose.yml environment variables:
@@ -75,7 +96,7 @@ docker-compose exec app php artisan key:generate
 # DB_PASSWORD=pass123
 
 # Run initial migration
-docker-compose exec app php artisan migrate
+docker compose exec app php artisan migrate
 ```
 
 ### Working with Laravel
@@ -84,16 +105,16 @@ All Laravel/Composer/Artisan commands should be executed inside the app containe
 
 ```bash
 # Enter PHP container
-docker-compose exec app bash
+docker compose exec app bash
 
 # Install Composer dependencies
-docker-compose exec app composer install
+docker compose exec app composer install
 
 # Run migrations
-docker-compose exec app php artisan migrate
+docker compose exec app php artisan migrate
 
 # Run specific Artisan command
-docker-compose exec app php artisan <command>
+docker compose exec app php artisan <command>
 ```
 
 ### Frontend Development with Vite
@@ -115,14 +136,14 @@ server: {
 Then run Vite dev server:
 
 ```bash
-docker-compose exec app npm run dev
+docker compose exec app npm run dev
 ```
 
 ### Production Deployment
 
 ```bash
 # Use production compose override
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 Note: Production configuration expects external database (Aurora MySQL) - database credentials should be set via environment variables.
@@ -132,6 +153,29 @@ Note: Production configuration expects external database (Aurora MySQL) - databa
 - Application: http://localhost
 - Database: localhost:3306
 - Vite HMR: localhost:5173
+
+## Git Workflow
+
+This repository uses a feature-branch workflow for learning purposes:
+
+- **Default branch**: `main`
+- **Workflow**: Create feature branches → Commit with learning notes → Create PR with detailed learning summary → User reviews and merges
+- Use `git switch` (not `git checkout`) for branch operations
+- Each PR should document what was learned (e.g., Blade directives, routing patterns, etc.)
+
+Example workflow:
+```bash
+# Create feature branch
+git switch -c feature/learn-something-new
+
+# Make changes and commit
+git add .
+git commit -m "Learn XYZ feature"
+
+# Push and create PR
+git push -u origin feature/learn-something-new
+gh pr create --title "Learn XYZ" --body "Learning summary..."
+```
 
 ## Important Notes
 
